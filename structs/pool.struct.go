@@ -36,6 +36,7 @@ func (pool *Pool) Start() {
 				To:   "all",
 				Msg:  fmt.Sprintf("User %s Connected!...", nc.ID),
 			}
+			fmt.Println(mess)
 			for _, client := range pool.Clients {
 				if nc.ID != client.ID {
 					if err := client.Send(mess); err != nil {
@@ -44,6 +45,7 @@ func (pool *Pool) Start() {
 					}
 				}
 			}
+
 		case ec := <-pool.Unregister:
 			delete(pool.Clients, ec.ID)
 			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
@@ -60,6 +62,7 @@ func (pool *Pool) Start() {
 					}
 				}
 			}
+			
 		case message := <-pool.Broadcast:
 			if message.To == "all" {
 				for _, client := range pool.Clients {

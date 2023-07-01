@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/zuno90/go-ws/entities"
@@ -11,20 +10,22 @@ import (
 
 func SignUp(c *fiber.Ctx) error {
 	fmt.Println("sign up!")
-	return c.Status(http.StatusOK).JSON(st.Resp(true, "sign up!", nil))
+	return c.Status(fiber.StatusOK).JSON(st.Resp(true, "sign up!", nil, nil))
 }
 
 func Login(c *fiber.Ctx) error {
-	user := entities.UserInput{}
-	if err := c.BodyParser(&user); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(st.Resp(false, "Bad input!", nil))
+	userInput := entities.UserInput{}
+	if err := c.BodyParser(&userInput); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(st.Resp(false, "Bad input!", nil, nil))
 	}
 
-	fmt.Printf("username: %s password: %s", user.Username, user.Password)
+	fmt.Printf("username: %s password: %s", userInput.Username, userInput.Password)
 	// validate input
-
+	if errors := ValidateStruct(userInput); errors != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(st.Resp(false, "", nil, errors))
+	}
 	// check database
 
 	// response jwt
-	return c.Status(http.StatusOK).JSON(st.Resp(true, "sign in!", nil))
+	return c.Status(fiber.StatusOK).JSON(st.Resp(true, "sign in!", nil, nil))
 }

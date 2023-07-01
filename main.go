@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	"github.com/zuno90/go-ws/configs"
 	"github.com/zuno90/go-ws/routes"
 )
 
@@ -20,7 +19,7 @@ func main() {
 		}
 	}
 	// connect database
-	configs.ConnectPostgresDB()
+	// configs.ConnectPostgresDB()
 
 	// init httpserver/websocket
 	app := fiber.New()
@@ -28,7 +27,7 @@ func main() {
 	routes.SetUpRoutes(app)
 	routes.SetUpWebsocket(app)
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen("localhost:3000"))
 	// Access the websocket server: ws://localhost:3000/ws/123?v=1.0
 	// https://www.websocket.org/echo.html
 }
