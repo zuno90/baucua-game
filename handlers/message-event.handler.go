@@ -12,13 +12,13 @@ import (
 // 	err     error
 // )
 
-func HandleConn(c *websocket.Conn, p *structs.Pool) {
+func HandleConn(c *websocket.Conn, s *structs.Server) {
 	uniqueID := uuid.New()
 	client := &structs.Client{
-		ID:   uniqueID.String(),
-		Conn: c,
-		Pool: p,
+		ID:     uniqueID.String(),
+		Conn:   c,
+		Server: s,
 	}
-	p.Register <- client
+	s.Register <- client
 	client.Read()
 }

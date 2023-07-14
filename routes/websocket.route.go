@@ -10,8 +10,8 @@ import (
 )
 
 func SetUpWebsocket(app *fiber.App) {
-	pool := structs.NewPool()
-	go pool.Start()
+	server := structs.ServerInstance()
+	go server.Start()
 	// websocket
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		// IsWebSocketUpgrade returns true if the client requested upgrade to the WebSocket protocol.
@@ -27,13 +27,12 @@ func SetUpWebsocket(app *fiber.App) {
 	}))
 
 	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
-		
 		// log.Println(c.Locals("allowed"))  // true
 		// log.Println(c.Params("id"))       // 123
 		// log.Println(c.Query("v"))         // 1.0
 		// log.Println(c.Cookies("session")) // ""
 
 		// websocket.Conn bindings https://pkg.go.dev/github.com/fasthttp/websocket?tab=doc#pkg-index
-		handlers.HandleConn(c, pool)
+		handlers.HandleConn(c, server)
 	}))
 }

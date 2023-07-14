@@ -9,31 +9,31 @@ import (
 )
 
 type Client struct {
-	ID   string
-	Conn *websocket.Conn
-	Pool *Pool
+	ID     string
+	Conn   *websocket.Conn
+	Server *Server
 }
 
 func (c *Client) Read() error {
 	defer func() {
-		c.Pool.Unregister <- c
+		c.Server.Unregister <- c
 		c.Conn.Close()
 	}()
 
 	for {
 		_, msg, err := c.Conn.ReadMessage()
 		if err != nil {
-			log.Println("Bad connection :::::",err)
+			log.Println("Bad connection :::::", err)
 			return err
 		}
 		nm := Payload{From: c.ID}
 		nm.Type = "chat"
 		if err := json.Unmarshal([]byte(msg), &nm); err != nil {
-			fmt.Println("Payload is wrong format :::::",err)
+			fmt.Println("Payload is wrong format :::::", err)
 			m := Payload{From: c.ID, Msg: "Payload is wrong format!"}
 			c.Send(m)
 		}
-		c.Pool.Broadcast <- nm
+		c.Server.Broadcast <- nm
 	}
 }
 
