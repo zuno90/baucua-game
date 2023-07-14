@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/zuno90/go-ws/entities"
+	en "github.com/zuno90/go-ws/entities"
 	st "github.com/zuno90/go-ws/structs"
 )
 
@@ -14,7 +14,7 @@ func SignUp(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-	userInput := entities.UserInput{}
+	userInput := en.UserInput{}
 	if err := c.BodyParser(&userInput); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(st.Resp(false, "Bad input!", nil, nil))
 	}
