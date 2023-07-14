@@ -11,11 +11,10 @@ import (
 type Client struct {
 	ID   string
 	Conn *websocket.Conn
-	Pm   chan string
 	Pool *Pool
 }
 
-func (c *Client) Read() {
+func (c *Client) Read() error {
 	defer func() {
 		c.Pool.Unregister <- c
 		c.Conn.Close()
@@ -24,18 +23,23 @@ func (c *Client) Read() {
 	for {
 		_, msg, err := c.Conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
-			return
+			log.Println("Bad connection :::::",err)
+			return err
 		}
 		nm := Payload{From: c.ID}
+		nm.Type = "chat"
 		if err := json.Unmarshal([]byte(msg), &nm); err != nil {
-			fmt.Println(err)
-			return
+			fmt.Println("Payload is wrong format :::::",err)
+			m := Payload{From: c.ID, Msg: "Payload is wrong format!"}
+			c.Send(m)
 		}
 		c.Pool.Broadcast <- nm
 	}
 }
 
 func (c *Client) Send(payload Payload) error {
-	return c.Conn.WriteMessage(websocket.TextMessage, []byte(payload.Msg))
+	if err := c.Conn.WriteMessage(websocket.TextMessage, []byte(payload.Msg)); err != nil {
+		return err
+	}
+	return nil
 }

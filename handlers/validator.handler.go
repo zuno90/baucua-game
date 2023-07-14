@@ -5,8 +5,6 @@ import (
 	st "github.com/zuno90/go-ws/structs"
 )
 
-
-
 var validate = validator.New()
 
 func ValidateStruct[T any](vT T) []*st.ErrorResponse {

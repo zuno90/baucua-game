@@ -2,6 +2,7 @@ package structs
 
 import (
 	"fmt"
+	"reflect"
 )
 
 type Pool struct {
@@ -10,7 +11,6 @@ type Pool struct {
 	Clients    map[string]*Client
 	Match      chan *Client
 	Broadcast  chan Payload
-	Pm         chan Payload
 }
 
 // singleton pattern
@@ -21,7 +21,6 @@ func NewPool() *Pool {
 		Clients:    make(map[string]*Client),
 		Match:      make(chan *Client),
 		Broadcast:  make(chan Payload),
-		Pm:         make(chan Payload),
 	}
 }
 
@@ -39,10 +38,7 @@ func (pool *Pool) Start() {
 			fmt.Println(mess)
 			for _, client := range pool.Clients {
 				if nc.ID != client.ID {
-					if err := client.Send(mess); err != nil {
-						fmt.Println(err)
-						return
-					}
+					client.Send(mess)
 				}
 			}
 
@@ -56,29 +52,25 @@ func (pool *Pool) Start() {
 			}
 			for _, client := range pool.Clients {
 				if ec.ID != client.ID {
-					if err := client.Send(mess); err != nil {
-						fmt.Println(err)
-						return
-					}
+					client.Send(mess);
 				}
 			}
 			
 		case message := <-pool.Broadcast:
-			if message.To == "all" {
-				for _, client := range pool.Clients {
-					if client.ID != message.From {
-						if err := client.Send(message); err != nil {
-							fmt.Println(err)
-							return
+			if message.Type == "chat" {
+				// broadcast to all
+				mv := reflect.ValueOf(message)
+				if message.To == "all" || !mv.FieldByName(message.To).IsValid() {
+					for _, client := range pool.Clients {
+						if client.ID != message.From {
+							client.Send(message)
 						}
 					}
 				}
-			}
-			if rc, ok := pool.Clients[message.To]; ok {
-				if rc.ID == message.To {
-					if err := rc.Send(message); err != nil {
-						fmt.Println(err)
-						return
+				// Pm to user
+				if rc, ok := pool.Clients[message.To]; ok {
+					if rc.ID == message.To {
+						rc.Send(message)
 					}
 				}
 			}

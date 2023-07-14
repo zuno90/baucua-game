@@ -5,7 +5,7 @@ import (
 	"github.com/zuno90/go-ws/handlers"
 )
 
-func SetUpRoutes(app *fiber.App) {
+func SetUpHttpRoutes(app *fiber.App) {
 	// auth
 	app.Post("/auth/signup", handlers.SignUp)
 	app.Post("/auth/login", handlers.Login)

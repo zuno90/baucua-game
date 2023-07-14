@@ -24,7 +24,7 @@ func main() {
 	// init httpserver/websocket
 	app := fiber.New()
 
-	routes.SetUpRoutes(app)
+	routes.SetUpHttpRoutes(app)
 	routes.SetUpWebsocket(app)
 
 	log.Fatal(app.Listen("localhost:3000"))

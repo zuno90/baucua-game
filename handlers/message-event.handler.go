@@ -6,13 +6,13 @@ import (
 	"github.com/zuno90/go-ws/structs"
 )
 
-var (
-	msgType int
-	msg     []byte
-	err     error
-)
+// var (
+// 	msgType int
+// 	msg     []byte
+// 	err     error
+// )
 
-func HandleConn(p *structs.Pool, c *websocket.Conn) {
+func HandleConn(c *websocket.Conn, p *structs.Pool) {
 	uniqueID := uuid.New()
 	client := &structs.Client{
 		ID:   uniqueID.String(),
