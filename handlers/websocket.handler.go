@@ -3,7 +3,7 @@ package handlers
 import (
 	"github.com/gofiber/websocket/v2"
 	"github.com/google/uuid"
-	"github.com/zuno90/go-ws/structs"
+	st "github.com/zuno90/go-ws/structs"
 )
 
 // var (
@@ -12,13 +12,13 @@ import (
 // 	err     error
 // )
 
-func HandleConn(c *websocket.Conn, s *structs.Server) {
+func HandleConn(c *websocket.Conn, s *st.Server) {
 	uniqueID := uuid.New()
-	client := &structs.Client{
+	client := &st.Client{
 		ID:     uniqueID.String(),
 		Conn:   c,
 		Server: s,
 	}
 	s.Register <- client
-	client.Read()
+	client.ConnectToServer()
 }

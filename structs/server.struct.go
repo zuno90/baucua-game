@@ -5,26 +5,29 @@ import (
 	"reflect"
 )
 
+
 type Server struct {
 	Register   chan *Client
 	Unregister chan *Client
 	Clients    map[string]*Client
-	Match      chan *Client
+	Rooms      map[string]*Room
 	Broadcast  chan Payload
+	Action chan Payload
 }
 
-// singleton pattern
+// singleton pattern - create server/lobby room
 func ServerInstance() *Server {
 	return &Server{
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[string]*Client),
-		Match:      make(chan *Client),
+		Rooms:      make(map[string]*Room),
 		Broadcast:  make(chan Payload),
+		Action: make(chan Payload),
 	}
 }
 
-func (server *Server) Start() {
+func (server *Server) ListenChannel() {
 	for {
 		select {
 		case nc := <-server.Register:
@@ -55,10 +58,10 @@ func (server *Server) Start() {
 			}
 
 		case message := <-server.Broadcast:
-if message.Type == "chat" {
+			if message.Type == "CHAT" {
 				// broadcast to all
 				mv := reflect.ValueOf(message)
-				if message.To == "all" || !mv.FieldByName(message.To).IsValid() {
+				if message.To == "all" || !mv.FieldByName(message.To).IsValid() && mv.FieldByName(message.Msg).IsValid() {
 					for _, client := range server.Clients {
 						if client.ID != message.From {
 							client.Send(message)
@@ -70,6 +73,15 @@ if message.Type == "chat" {
 					if rc.ID == message.To {
 						rc.Send(message)
 					}
+				}
+			}
+
+		case ma := <-server.Action:
+			if ma.Type ==  "CREATEROOM" {
+				host := server.Clients[ma.From]
+				if err:=host.CreateRoom(); err != nil {
+					ms := Payload{From: ma.From, Msg: "Bad request! Can not create a new room!"}
+					host.Send(ms)
 				}
 			}
 		}

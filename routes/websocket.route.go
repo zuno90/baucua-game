@@ -5,13 +5,13 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
-	"github.com/zuno90/go-ws/handlers"
-	"github.com/zuno90/go-ws/structs"
+	hdl "github.com/zuno90/go-ws/handlers"
+	st "github.com/zuno90/go-ws/structs"
 )
 
 func SetUpWebsocket(app *fiber.App) {
-	server := structs.ServerInstance()
-	go server.Start()
+	server := st.ServerInstance()
+	go server.ListenChannel()
 	// websocket
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		// IsWebSocketUpgrade returns true if the client requested upgrade to the WebSocket protocol.
@@ -33,6 +33,6 @@ func SetUpWebsocket(app *fiber.App) {
 		// log.Println(c.Cookies("session")) // ""
 
 		// websocket.Conn bindings https://pkg.go.dev/github.com/fasthttp/websocket?tab=doc#pkg-index
-		handlers.HandleConn(c, server)
+		hdl.HandleConn(c, server)
 	}))
 }
