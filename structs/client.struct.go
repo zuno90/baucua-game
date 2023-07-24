@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"github.com/gofiber/websocket/v2"
-	"github.com/google/uuid"
 )
 
 type Client struct {
@@ -55,22 +54,20 @@ func (c *Client) Send(payload Payload) error {
 // ROOM
 // create room
 func (c *Client) CreateRoom() error {
-	uniqueId := uuid.New()
-	newRoom := &Room{
-		ID: uniqueId.String(),
-		Level: "LOW",
-		Players: make(map[string]*Player),
-		Join: make(chan *Player),
-	}
-	if err := c.JoinRoom(newRoom.ID); err != nil {
+	newRoom := c.RoomInstance("LOW")
+	if err := c.JoinRoom(newRoom); err != nil {
 		return err
 	}
+	go newRoom.ListenChannel()
+	fmt.Println(newRoom)
 	return nil
 }
 
 // join room
-func (c *Client) JoinRoom(id string) error {
+func (c *Client) JoinRoom(r *Room) error {
 	// create test player
 	newPlayer := c.NewPlayer("1","zuno", 100.67)
-	c.Room.Join <- newPlayer
+	r.Players[newPlayer.ID] = newPlayer
+	r.Join <- newPlayer
+	return nil
 }

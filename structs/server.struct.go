@@ -61,7 +61,8 @@ func (server *Server) ListenChannel() {
 			if message.Type == "CHAT" {
 				// broadcast to all
 				mv := reflect.ValueOf(message)
-				if message.To == "all" || !mv.FieldByName(message.To).IsValid() && mv.FieldByName(message.Msg).IsValid() {
+				// fmt.Println(mv.FieldByName(message.Msg).IsValid())
+				if message.To == "all" || !mv.FieldByName(message.To).IsValid() {
 					for _, client := range server.Clients {
 						if client.ID != message.From {
 							client.Send(message)
@@ -79,10 +80,11 @@ func (server *Server) ListenChannel() {
 		case ma := <-server.Action:
 			if ma.Type ==  "CREATEROOM" {
 				host := server.Clients[ma.From]
-				if err:=host.CreateRoom(); err != nil {
+				if err := host.CreateRoom(); err != nil {
 					ms := Payload{From: ma.From, Msg: "Bad request! Can not create a new room!"}
 					host.Send(ms)
 				}
+				
 			}
 		}
 	}

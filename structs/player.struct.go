@@ -1,9 +1,9 @@
 package structs
 
 type Player struct {
-	ID   string
-	Name string
-	Coin float64
+	ID     string
+	Name   string
+	Coin   float64
 	Client *Client
 }
 
