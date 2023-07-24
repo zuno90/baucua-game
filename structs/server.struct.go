@@ -84,7 +84,6 @@ func (server *Server) ListenChannel() {
 					ms := Payload{From: ma.From, Msg: "Bad request! Can not create a new room!"}
 					host.Send(ms)
 				}
-				
 			}
 		}
 	}

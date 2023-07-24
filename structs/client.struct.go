@@ -55,19 +55,16 @@ func (c *Client) Send(payload Payload) error {
 // create room
 func (c *Client) CreateRoom() error {
 	newRoom := c.RoomInstance("LOW")
-	if err := c.JoinRoom(newRoom); err != nil {
-		return err
-	}
+	c.JoinRoom(newRoom)
 	go newRoom.ListenChannel()
-	fmt.Println(newRoom)
 	return nil
 }
 
 // join room
-func (c *Client) JoinRoom(r *Room) error {
+func (c *Client) JoinRoom(r *Room)  {
 	// create test player
 	newPlayer := c.NewPlayer("1","zuno", 100.67)
 	r.Players[newPlayer.ID] = newPlayer
+	fmt.Println(r)
 	r.Join <- newPlayer
-	return nil
 }
