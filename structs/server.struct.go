@@ -2,9 +2,9 @@ package structs
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 )
-
 
 type Server struct {
 	Register   chan *Client
@@ -12,7 +12,7 @@ type Server struct {
 	Clients    map[string]*Client
 	Rooms      map[string]*Room
 	Broadcast  chan Payload
-	Action chan Payload
+	Action     chan Payload
 }
 
 // singleton pattern - create server/lobby room
@@ -23,7 +23,7 @@ func ServerInstance() *Server {
 		Clients:    make(map[string]*Client),
 		Rooms:      make(map[string]*Room),
 		Broadcast:  make(chan Payload),
-		Action: make(chan Payload),
+		Action:     make(chan Payload),
 	}
 }
 
@@ -37,7 +37,6 @@ func (server *Server) ListenChannel() {
 				From: nc.ID,
 				Msg:  fmt.Sprintf("User %s Connected!...", nc.ID),
 			}
-			fmt.Println(mess)
 			for _, client := range server.Clients {
 				if nc.ID != client.ID {
 					client.Send(mess)
@@ -78,11 +77,22 @@ func (server *Server) ListenChannel() {
 			}
 
 		case ma := <-server.Action:
-			if ma.Type ==  "CREATEROOM" {
-				host := server.Clients[ma.From]
-				if err := host.CreateRoom(); err != nil {
+			client := server.Clients[ma.From]
+			switch ma.Type {
+			case "CREATEROOM":
+				if err := client.CreateRoom(); err != nil {
 					ms := Payload{From: ma.From, Msg: "Bad request! Can not create a new room!"}
-					host.Send(ms)
+					client.Send(ms)
+				}
+			case "JOINROOM":
+				roomId := ma.Msg
+				r, ok := server.Rooms[roomId]
+				if !ok {
+					ms := Payload{From: ma.From, Msg: "Room is not existing!"}
+					client.Send(ms)
+				}
+				if err := client.JoinRoom(r); err != nil {
+					log.Fatal(err)
 				}
 			}
 		}

@@ -12,7 +12,7 @@ type Client struct {
 	ID     string
 	Conn   *websocket.Conn
 	Server *Server
-	Room *Room
+	Room   []*Room
 }
 
 func (c *Client) ConnectToServer() error {
@@ -34,7 +34,6 @@ func (c *Client) ConnectToServer() error {
 			m := Payload{From: c.ID, Msg: "Payload is wrong format!"}
 			c.Send(m)
 		}
-		// nm.Type = "CHAT"
 		switch nm.Type {
 		case "CHAT":
 			c.Server.Broadcast <- nm
@@ -55,16 +54,23 @@ func (c *Client) Send(payload Payload) error {
 // create room
 func (c *Client) CreateRoom() error {
 	newRoom := c.RoomInstance("LOW")
-	c.JoinRoom(newRoom)
+	c.Server.Rooms[newRoom.ID] = newRoom
 	go newRoom.ListenChannel()
+	if err := c.JoinRoom(newRoom); err != nil {
+		return err
+	}
+	fmt.Println("room id", newRoom.ID)
 	return nil
 }
 
 // join room
-func (c *Client) JoinRoom(r *Room)  {
+func (c *Client) JoinRoom(r *Room) error {
 	// create test player
-	newPlayer := c.NewPlayer("1","zuno", 100.67)
-	r.Players[newPlayer.ID] = newPlayer
-	fmt.Println(r)
-	r.Join <- newPlayer
+	newPlayer := c.NewPlayer(c.ID[0:5], "zuno" + c.ID[0:5], 1000)
+	c.Room = append(c.Room, r)
+	r.Players[c.ID] = newPlayer
+	go func() {
+		r.Join <- newPlayer
+	}()
+	return nil
 }
