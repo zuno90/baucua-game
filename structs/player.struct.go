@@ -22,5 +22,5 @@ func (c *Client) NewPlayer(id string, name string, coin float64) *Player {
 }
 
 func (p Player) joinRoom() {
-	fmt.Println("player",p.Name, "join room")
+	fmt.Println("player", p.Name, "join room!")
 }

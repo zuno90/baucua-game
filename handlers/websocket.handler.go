@@ -18,7 +18,7 @@ func HandleConn(c *websocket.Conn, s *st.Server) {
 		ID:     uniqueID.String(),
 		Conn:   c,
 		Server: s,
-		Room: make([]*st.Room, 1),
+		Room:   make([]string, 1),
 	}
 	s.Register <- client
 	client.ConnectToServer()

@@ -33,12 +33,9 @@ func (server *Server) ListenChannel() {
 		case nc := <-server.Register:
 			server.Clients[nc.ID] = nc
 			fmt.Println("Size of Connection Server: ", len(server.Clients))
-			mess := Payload{
-				From: nc.ID,
-				Msg:  fmt.Sprintf("User %s Connected!...", nc.ID),
-			}
 			for _, client := range server.Clients {
 				if nc.ID != client.ID {
+					mess := CustomErr(nc.ID, fmt.Sprintf("User %s Connected!...", nc.ID))
 					client.Send(mess)
 				}
 			}
@@ -46,12 +43,9 @@ func (server *Server) ListenChannel() {
 		case ec := <-server.Unregister:
 			delete(server.Clients, ec.ID)
 			fmt.Println("Size of Connection Server: ", len(server.Clients))
-			mess := Payload{
-				From: ec.ID,
-				Msg:  fmt.Sprintf("User %s Disconnected!...", ec.ID),
-			}
 			for _, client := range server.Clients {
 				if ec.ID != client.ID {
+					mess := CustomErr(ec.ID, fmt.Sprintf("User %s Disconnected!...", ec.ID))
 					client.Send(mess)
 				}
 			}
@@ -80,15 +74,22 @@ func (server *Server) ListenChannel() {
 			client := server.Clients[ma.From]
 			switch ma.Type {
 			case "CREATEROOM":
+				fmt.Println("client in room", client.Room)
+				fmt.Println("length of client in room", len(client.Room))
+
+				if len(client.Room) > 0 {
+					em := CustomErr(ma.From, "You was currently in Room!")
+					client.Send(em)
+				}
 				if err := client.CreateRoom(); err != nil {
-					ms := Payload{From: ma.From, Msg: "Bad request! Can not create a new room!"}
+					ms := CustomErr(ma.From, "Bad request! Can not create a new room!")
 					client.Send(ms)
 				}
 			case "JOINROOM":
 				roomId := ma.Msg
 				r, ok := server.Rooms[roomId]
 				if !ok {
-					ms := Payload{From: ma.From, Msg: "Room is not existing!"}
+					ms := CustomErr(ma.From, "Room is not existing!")
 					client.Send(ms)
 				}
 				if err := client.JoinRoom(r); err != nil {

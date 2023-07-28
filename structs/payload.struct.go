@@ -16,3 +16,10 @@ type Payload struct {
 	To   string `json:"to"`
 	Msg  string `json:"msg"`
 }
+
+func CustomErr(from, msg string) Payload {
+	return Payload{
+		From: from,
+		Msg:  msg,
+	}
+}

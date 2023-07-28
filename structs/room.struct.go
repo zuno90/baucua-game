@@ -33,14 +33,9 @@ func (room *Room) ListenChannel() {
 	for {
 		select {
 		case jp := <-room.Join:
-			// fmt.Println("new player had joined room", jp)
-			// fmt.Println("room state", room)
-			// fmt.Println("player in room", *jp)
 			jp.joinRoom()
-		
-		// case <-room.Leave:
-		
-		}
+			// case <-room.Leave:
 
+		}
 	}
 }

@@ -12,7 +12,7 @@ type Client struct {
 	ID     string
 	Conn   *websocket.Conn
 	Server *Server
-	Room   []*Room
+	Room   []string
 }
 
 func (c *Client) ConnectToServer() error {
@@ -66,8 +66,8 @@ func (c *Client) CreateRoom() error {
 // join room
 func (c *Client) JoinRoom(r *Room) error {
 	// create test player
-	newPlayer := c.NewPlayer(c.ID[0:5], "zuno" + c.ID[0:5], 1000)
-	c.Room = append(c.Room, r)
+	newPlayer := c.NewPlayer(c.ID[0:5], "zuno"+c.ID[0:5], 1000)
+	c.Room = append(c.Room, r.ID)
 	r.Players[c.ID] = newPlayer
 	go func() {
 		r.Join <- newPlayer
