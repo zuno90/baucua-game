@@ -6,20 +6,52 @@ import (
 	"log"
 
 	"github.com/gofiber/websocket/v2"
+	"golang.org/x/exp/slices"
 )
+
+type ClientAction interface {
+	ConnectToServer() error
+	Send() error
+	CreatePlayer() error
+	CreateRoom() error
+	JoinRoom() error
+}
 
 type Client struct {
 	ID     string
 	Conn   *websocket.Conn
 	Server *Server
 	Room   []string
+	Player map[string]*Player
 }
+
+type Joiner struct {
+	CId string
+	PId int32
+}
+
+var players []*Joiner
 
 func (c *Client) ConnectToServer() error {
 	defer func() {
+		// remove id from players slice
+		if idx := slices.IndexFunc(players, func(j *Joiner) bool { return j.CId == c.ID }); idx > -1 {
+			players = slices.Delete(players, idx, idx+1)
+		}
+		// disconnect & close connection
 		c.Server.Unregister <- c
 		c.Conn.Close()
 	}()
+	// validate player existing player id
+	for _, p := range players {
+		if c.Player[c.ID].Id == p.PId {
+			c.SendError(ResErrorMessage("ERROR", 403, "Player is existing!"))
+			return fmt.Errorf("Player is existing!")
+		}
+	}
+	j := &Joiner{CId: c.ID, PId: c.Player[c.ID].Id}
+	players = append(players, j)
+	c.Server.Register <- c
 
 	// listen all events
 	for {
@@ -31,8 +63,8 @@ func (c *Client) ConnectToServer() error {
 		nm := Payload{From: c.ID}
 		if err := json.Unmarshal([]byte(msg), &nm); err != nil {
 			fmt.Println("Payload is wrong format :::::", err)
-			m := Payload{From: c.ID, Msg: "Payload is wrong format!"}
-			c.Send(m)
+			m := ResErrorMessage(nm.Type, 400, "Payload is wrong format") /* Payload{From: c.ID, Msg: "Payload is wrong format!"} */
+			c.SendError(m)
 		}
 		switch nm.Type {
 		case "CHAT":
@@ -43,8 +75,23 @@ func (c *Client) ConnectToServer() error {
 	}
 }
 
-func (c *Client) Send(payload Payload) error {
-	if err := c.Conn.WriteMessage(websocket.TextMessage, []byte(payload.Msg)); err != nil {
+func (c *Client) Send(d ResData) error {
+	resD, err := json.Marshal(d)
+	if err != nil {
+		log.Println(err)
+	}
+	if err := c.Conn.WriteMessage(websocket.TextMessage, resD); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) SendError(e ResError) error {
+	resE, err := json.Marshal(e)
+	if err != nil {
+		log.Println(err)
+	}
+	if err := c.Conn.WriteMessage(websocket.TextMessage, resE); err != nil {
 		return err
 	}
 	return nil
@@ -66,7 +113,7 @@ func (c *Client) CreateRoom() error {
 // join room
 func (c *Client) JoinRoom(r *Room) error {
 	// create test player
-	newPlayer := c.NewPlayer(c.ID[0:5], "zuno"+c.ID[0:5], 1000)
+	newPlayer := NewPlayer(99, "zuno"+c.ID[0:5], 1000)
 	c.Room = append(c.Room, r.ID)
 	r.Players[c.ID] = newPlayer
 	go func() {

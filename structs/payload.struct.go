@@ -8,6 +8,11 @@ const (
 	CHATROOM   Types = "CHATROOM"
 	JOINROOM   Types = "JOINROOM"
 	LEAVEROOM  Types = "LEAVEROOM"
+	WELCOME    Types = "WELCOME"
+	BYEBYE     Types = "BYEBYE"
+	LOGIN      Types = "LOGIN"
+	LOGOUT     Types = "LOGOUT"
+	ERROR      Types = "ERROR"
 )
 
 type Payload struct {
@@ -17,9 +22,28 @@ type Payload struct {
 	Msg  string `json:"msg"`
 }
 
-func CustomErr(from, msg string) Payload {
-	return Payload{
-		From: from,
+type ResData struct {
+	Type Types  `json:"type"`
+	Msg  string `json:"msg"`
+}
+
+type ResError struct {
+	Type Types  `json:"type"`
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}
+
+func ResMessage(t Types, msg string) ResData {
+	return ResData{
+		Type: t,
+		Msg:  msg,
+	}
+}
+
+func ResErrorMessage(t Types, code int, msg string) ResError {
+	return ResError{
+		Type: t,
+		Code: code,
 		Msg:  msg,
 	}
 }

@@ -1,6 +1,6 @@
 package structs
 
-import "fmt"
+import "log"
 
 type PlayerAction interface {
 	joinRoom() error
@@ -8,19 +8,19 @@ type PlayerAction interface {
 }
 
 type Player struct {
-	ID   string
-	Name string
-	Coin float64
+	Id     int32   `json:"id"`
+	Name   string  `json:"name"`
+	Amount float64 `json:"amount"`
 }
 
-func (c *Client) NewPlayer(id string, name string, coin float64) *Player {
+func NewPlayer(id int32, username string, amount float64) *Player {
 	return &Player{
-		ID:   id,
-		Name: name,
-		Coin: coin,
+		Id:     id,
+		Name:   username,
+		Amount: amount,
 	}
 }
 
-func (p Player) joinRoom() {
-	fmt.Println("player", p.Name, "join room!")
+func (p *Player) joinRoom() {
+	log.Printf("player %s has joined!", p.Name)
 }
