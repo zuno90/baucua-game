@@ -17,7 +17,8 @@ var (
 func SetUpWebsocket(app *fiber.App) {
 	// initialize server
 	server := st.ServerInstance()
-	go server.ListenChannel()
+	server.StartGame()
+	go server.ListenEvents()
 	// websocket
 	h := func(c *fiber.Ctx) error {
 		// IsWebSocketUpgrade returns true if the client requested upgrade to the WebSocket protocol.

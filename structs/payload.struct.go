@@ -9,6 +9,8 @@ const (
 	JOINROOM   Types = "JOINROOM"
 	LEAVEROOM  Types = "LEAVEROOM"
 	WELCOME    Types = "WELCOME"
+	GAMEINFO   Types = "GAMEINFO"
+	RESULT     Types = "RESULT"
 	BYEBYE     Types = "BYEBYE"
 	LOGIN      Types = "LOGIN"
 	LOGOUT     Types = "LOGOUT"
@@ -24,6 +26,8 @@ type Payload struct {
 
 type ResData struct {
 	Type Types  `json:"type"`
+	From string `json:"from,omitempty"`
+	To   string `json:"to,omitempty"`
 	Msg  string `json:"msg"`
 }
 

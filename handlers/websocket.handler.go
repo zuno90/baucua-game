@@ -26,5 +26,4 @@ func HandleConn(c *websocket.Conn, s *st.Server, user *pb.User) {
 	}
 	client.Player[client.ID] = np
 	client.ConnectToServer()
-	// s.Register <- client
 }

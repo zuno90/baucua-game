@@ -35,7 +35,6 @@ func (room *Room) ListenChannel() {
 		case jp := <-room.Join:
 			jp.joinRoom()
 			// case <-room.Leave:
-
 		}
 	}
 }

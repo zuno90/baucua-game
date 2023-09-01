@@ -60,14 +60,14 @@ func (c *Client) ConnectToServer() error {
 			log.Println("Bad connection :::::", err)
 			return err
 		}
-		nm := Payload{From: c.ID}
+		nm := ResData{From: c.ID} /* Payload{From: c.ID} */
 		if err := json.Unmarshal([]byte(msg), &nm); err != nil {
 			fmt.Println("Payload is wrong format :::::", err)
 			m := ResErrorMessage(nm.Type, 400, "Payload is wrong format") /* Payload{From: c.ID, Msg: "Payload is wrong format!"} */
 			c.SendError(m)
 		}
 		switch nm.Type {
-		case "CHAT":
+		case Types(CHAT):
 			c.Server.Broadcast <- nm
 		default:
 			c.Server.Action <- nm
@@ -99,16 +99,16 @@ func (c *Client) SendError(e ResError) error {
 
 // ROOM
 // create room
-func (c *Client) CreateRoom() error {
-	newRoom := c.RoomInstance("LOW")
-	c.Server.Rooms[newRoom.ID] = newRoom
-	go newRoom.ListenChannel()
-	if err := c.JoinRoom(newRoom); err != nil {
-		return err
-	}
-	fmt.Println("room id", newRoom.ID)
-	return nil
-}
+// func (c *Client) CreateRoom() error {
+// 	newRoom := c.RoomInstance("LOW")
+// 	c.Server.Rooms[newRoom.ID] = newRoom
+// 	go newRoom.ListenChannel()
+// 	if err := c.JoinRoom(newRoom); err != nil {
+// 		return err
+// 	}
+// 	fmt.Println("room id", newRoom.ID)
+// 	return nil
+// }
 
 // join room
 func (c *Client) JoinRoom(r *Room) error {
