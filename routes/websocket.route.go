@@ -3,10 +3,11 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
+	st "github.com/zuno90/go-ws/handlers/game"
+
+	grpcclient "github.com/zuno90/go-ws/grpc-client"
 	hdl "github.com/zuno90/go-ws/handlers"
-	grpcclient "github.com/zuno90/go-ws/handlers/grpc-client"
 	pb "github.com/zuno90/go-ws/pb"
-	st "github.com/zuno90/go-ws/structs"
 )
 
 var (
@@ -30,12 +31,6 @@ func SetUpWebsocket(app *fiber.App) {
 			if err != nil || u == nil {
 				return fiber.ErrForbidden
 			}
-			// check if client is exist
-			playerChannel := make(chan int, 1)
-
-			go func() {
-				playerChannel <- int(u.GetId())
-			}()
 			user = u
 			return c.Next()
 		}

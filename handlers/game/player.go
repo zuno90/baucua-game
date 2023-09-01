@@ -1,4 +1,4 @@
-package structs
+package game
 
 import "log"
 

@@ -1,23 +1,23 @@
-package structs
+package game
 
 type Types string
 
 const (
-	CHAT       Types = "CHAT"
-	CREATEROOM Types = "CREATEROOM"
-	CHATROOM   Types = "CHATROOM"
-	JOINROOM   Types = "JOINROOM"
-	LEAVEROOM  Types = "LEAVEROOM"
-	WELCOME    Types = "WELCOME"
-	GAMEINFO   Types = "GAMEINFO"
-	RESULT     Types = "RESULT"
-	BYEBYE     Types = "BYEBYE"
-	LOGIN      Types = "LOGIN"
-	LOGOUT     Types = "LOGOUT"
-	ERROR      Types = "ERROR"
+	// CREATEROOM Types = "CREATEROOM"
+	// CHATROOM   Types = "CHATROOM"
+	// JOINROOM   Types = "JOINROOM"
+	// LEAVEROOM  Types = "LEAVEROOM"
+	CHAT     Types = "CHAT"
+	WELCOME  Types = "WELCOME"
+	GAMEINFO Types = "GAMEINFO"
+	RESULT   Types = "RESULT"
+	BYEBYE   Types = "BYEBYE"
+	LOGIN    Types = "LOGIN"
+	LOGOUT   Types = "LOGOUT"
+	ERROR    Types = "ERROR"
 )
 
-type Payload struct {
+type ReqData struct {
 	Type Types  `json:"type"`
 	From string `json:"from"`
 	To   string `json:"to"`

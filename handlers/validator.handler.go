@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/go-playground/validator"
-	st "github.com/zuno90/go-ws/structs"
+	st "github.com/zuno90/go-ws/handlers/game"
 )
 
 var validate = validator.New()

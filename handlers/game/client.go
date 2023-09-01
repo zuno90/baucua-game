@@ -1,4 +1,4 @@
-package structs
+package game
 
 import (
 	"encoding/json"
@@ -8,14 +8,6 @@ import (
 	"github.com/gofiber/websocket/v2"
 	"golang.org/x/exp/slices"
 )
-
-type ClientAction interface {
-	ConnectToServer() error
-	Send() error
-	CreatePlayer() error
-	CreateRoom() error
-	JoinRoom() error
-}
 
 type Client struct {
 	ID     string
@@ -60,17 +52,20 @@ func (c *Client) ConnectToServer() error {
 			log.Println("Bad connection :::::", err)
 			return err
 		}
-		nm := ResData{From: c.ID} /* Payload{From: c.ID} */
+		nm := ResData{From: c.ID}
 		if err := json.Unmarshal([]byte(msg), &nm); err != nil {
-			fmt.Println("Payload is wrong format :::::", err)
+			log.Println("Payload is wrong format :::::", err)
 			m := ResErrorMessage(nm.Type, 400, "Payload is wrong format") /* Payload{From: c.ID, Msg: "Payload is wrong format!"} */
 			c.SendError(m)
 		}
+		log.Println("wkdfjwdef", nm)
 		switch nm.Type {
 		case Types(CHAT):
 			c.Server.Broadcast <- nm
 		default:
-			c.Server.Action <- nm
+			log.Println("xuong dayyyyy")
+			m := ResErrorMessage(nm.Type, 400, "Payload is wrong format") /* Payload{From: c.ID, Msg: "Payload is wrong format!"} */
+			c.SendError(m)
 		}
 	}
 }
@@ -78,7 +73,7 @@ func (c *Client) ConnectToServer() error {
 func (c *Client) Send(d ResData) error {
 	resD, err := json.Marshal(d)
 	if err != nil {
-		log.Println(err)
+		log.Println("Can not marshal :::", err)
 	}
 	if err := c.Conn.WriteMessage(websocket.TextMessage, resD); err != nil {
 		return err
@@ -89,7 +84,7 @@ func (c *Client) Send(d ResData) error {
 func (c *Client) SendError(e ResError) error {
 	resE, err := json.Marshal(e)
 	if err != nil {
-		log.Println(err)
+		log.Println("Can not marshal :::", err)
 	}
 	if err := c.Conn.WriteMessage(websocket.TextMessage, resE); err != nil {
 		return err

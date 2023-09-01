@@ -1,4 +1,4 @@
-package structs
+package game
 
 import (
 	"encoding/json"
@@ -43,7 +43,7 @@ func (server *Server) StartGame() {
 		ng := server.NewGame(stage, gameno, sec)
 		gameinfo, err := json.Marshal(ng)
 		if err != nil {
-			fmt.Println("Can not marshal :::::", err)
+			log.Println("Can not marshal :::::", err)
 		}
 		return ResMessage(Types(GAMEINFO), string(gameinfo))
 	}
@@ -70,8 +70,8 @@ func (server *Server) ListenEvents() {
 			// send info to Client
 			clientInfo, err := json.Marshal(nc.Player)
 			if err != nil {
-				fmt.Println("Can not marshal :::::", err)
-				return
+				log.Println("Can not marshal :::::", err)
+				server.Unregister <- nc
 			}
 			// client info
 			info := ResMessage(Types(LOGIN), string(clientInfo))
@@ -79,18 +79,17 @@ func (server *Server) ListenEvents() {
 
 			// inform for others users
 			server.Clients[nc.ID] = nc
-			fmt.Println("Size of Connection Server (connect): ", len(server.Clients))
+			log.Println("Size of Connection Server (connect): ", len(server.Clients))
 			for _, client := range server.Clients {
 				if nc.ID != client.ID {
 					mess := ResMessage(Types(WELCOME), fmt.Sprintf("%s Connected!...", nc.Player[nc.ID].Name))
 					client.Send(mess)
 				}
 			}
-			//
 
 		case ec := <-server.Unregister:
 			delete(server.Clients, ec.ID)
-			fmt.Println("Size of Connection Server (disconnect): ", len(server.Clients))
+			log.Println("Size of Connection Server (disconnect): ", len(server.Clients))
 			for _, client := range server.Clients {
 				if ec.ID != client.ID {
 					mess := ResMessage(Types(BYEBYE), fmt.Sprintf("%s Disconnected!...", ec.Player[ec.ID].Name))
@@ -102,7 +101,7 @@ func (server *Server) ListenEvents() {
 			switch message.Type {
 			case Types(CHAT):
 				mv := reflect.ValueOf(message)
-				// fmt.Println(mv.FieldByName(message.Msg).IsValid())
+				// log.Println(mv.FieldByName(message.Msg).IsValid())
 				if message.To == "all" || !mv.FieldByName(message.To).IsValid() {
 					for _, client := range server.Clients {
 						if client.ID != message.From {
@@ -123,8 +122,9 @@ func (server *Server) ListenEvents() {
 				for _, client := range server.Clients {
 					client.Send(message)
 				}
+
 			case Types(RESULT):
-				log.Println("calll", message)
+				log.Println("game random result", message)
 				for _, client := range server.Clients {
 					client.Send(message)
 				}

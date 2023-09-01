@@ -3,8 +3,8 @@ package handlers
 import (
 	"github.com/gofiber/websocket/v2"
 	"github.com/google/uuid"
+	st "github.com/zuno90/go-ws/handlers/game"
 	pb "github.com/zuno90/go-ws/pb"
-	st "github.com/zuno90/go-ws/structs"
 )
 
 // var (

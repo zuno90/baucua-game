@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	en "github.com/zuno90/go-ws/entities"
-	st "github.com/zuno90/go-ws/structs"
+	st "github.com/zuno90/go-ws/handlers/game"
 )
 
 func SignUp(c *fiber.Ctx) error {

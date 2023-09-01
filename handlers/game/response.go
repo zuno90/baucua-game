@@ -1,4 +1,4 @@
-package structs
+package game
 
 type ErrorResponse struct {
 	FailedField string
