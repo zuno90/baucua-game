@@ -15,7 +15,6 @@ type Server struct {
 	Register   chan *Client
 	Unregister chan *Client
 	Clients    map[string]*Client
-	Rooms      map[string]*Room
 	Broadcast  chan ResData
 	Action     chan ResData
 }
@@ -26,7 +25,6 @@ func ServerInstance() *Server {
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[string]*Client),
-		Rooms:      make(map[string]*Room),
 		Broadcast:  make(chan ResData),
 		Action:     make(chan ResData),
 	}
@@ -73,11 +71,11 @@ func (server *Server) ListenEvents() {
 				log.Println("Can not marshal :::::", err)
 				server.Unregister <- nc
 			}
-			// client info
+			// client info (private)
 			info := ResMessage(Types(LOGIN), string(clientInfo))
 			nc.Send(info)
 
-			// inform for others users
+			// inform for others users (public)
 			server.Clients[nc.ID] = nc
 			log.Println("Size of Connection Server (connect): ", len(server.Clients))
 			for _, client := range server.Clients {

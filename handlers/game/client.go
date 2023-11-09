@@ -91,28 +91,3 @@ func (c *Client) SendError(e ResError) error {
 	}
 	return nil
 }
-
-// ROOM
-// create room
-// func (c *Client) CreateRoom() error {
-// 	newRoom := c.RoomInstance("LOW")
-// 	c.Server.Rooms[newRoom.ID] = newRoom
-// 	go newRoom.ListenChannel()
-// 	if err := c.JoinRoom(newRoom); err != nil {
-// 		return err
-// 	}
-// 	fmt.Println("room id", newRoom.ID)
-// 	return nil
-// }
-
-// join room
-func (c *Client) JoinRoom(r *Room) error {
-	// create test player
-	newPlayer := NewPlayer(99, "zuno"+c.ID[0:5], 1000)
-	c.Room = append(c.Room, r.ID)
-	r.Players[c.ID] = newPlayer
-	go func() {
-		r.Join <- newPlayer
-	}()
-	return nil
-}

@@ -7,7 +7,7 @@ import (
 
 func SetUpHttpRoutes(app *fiber.App) {
 	// auth
-	auth := app.Group("	/auth")
+	auth := app.Group("/auth")
 	auth.Post("/signup", handlers.SignUp)
 	auth.Post("/login", handlers.Login)
 }

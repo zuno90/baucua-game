@@ -5,14 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0a547ae4-1d6a-4ab3-b1a4-4b67f32f611d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/handlers/websocket.handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/websocket.handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/websocket.route.go" beforeDir="false" afterPath="$PROJECT_DIR$/routes/websocket.route.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/structs/client.struct.go" beforeDir="false" afterPath="$PROJECT_DIR$/structs/client.struct.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/structs/payload.struct.go" beforeDir="false" afterPath="$PROJECT_DIR$/structs/payload.struct.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/structs/room.struct.go" beforeDir="false" afterPath="$PROJECT_DIR$/structs/room.struct.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/structs/server.struct.go" beforeDir="false" afterPath="$PROJECT_DIR$/structs/server.struct.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/convert-type.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/remove-element.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/game/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/game/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/game.util.go" beforeDir="false" afterPath="$PROJECT_DIR$/utils/game.util.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +29,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2MAdmDskneEqVjRbRHbqlE93BRO" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
