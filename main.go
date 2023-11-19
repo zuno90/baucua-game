@@ -39,9 +39,6 @@ func main() {
 
 func initFiberServer() {
 	app := fiber.New()
-	// app.Get("/", func(c *fiber.Ctx) error {
-	// 	return c.SendString("Hello Fiber!")
-	// })
 
 	// routes.SetUpHttpRoutes(app)
 	routes.SetUpWebsocket(app)

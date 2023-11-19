@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	en "github.com/zuno90/go-ws/entities"
 	st "github.com/zuno90/go-ws/handlers/game"
+	"github.com/zuno90/go-ws/utils"
 )
 
 func SignUp(c *fiber.Ctx) error {
@@ -21,7 +22,7 @@ func Login(c *fiber.Ctx) error {
 
 	fmt.Printf("username: %s password: %s", userInput.Username, userInput.Password)
 	// validate input
-	if errors := ValidateStruct(userInput); errors != nil {
+	if errors := utils.ValidateStruct(userInput); errors != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(st.Resp(false, "", nil, errors))
 	}
 	// check database

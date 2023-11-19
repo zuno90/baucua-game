@@ -1,18 +1,23 @@
-package handlers
+package utils
 
 import (
 	"github.com/go-playground/validator"
-	st "github.com/zuno90/go-ws/handlers/game"
 )
+
+type ErrorResponse struct {
+	FailedField string
+	Tag         string
+	Value       string
+}
 
 var validate = validator.New()
 
-func ValidateStruct[T any](vT T) []*st.ErrorResponse {
-	errors := []*st.ErrorResponse{}
+func ValidateStruct[T any](vT T) []*ErrorResponse {
+	errors := []*ErrorResponse{}
 	err := validate.Struct(vT)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			element := &st.ErrorResponse{}
+			element := &ErrorResponse{}
 			element.FailedField = err.StructNamespace()
 			element.Tag = err.Tag()
 			element.Value = err.Param()

@@ -1,19 +1,15 @@
 package game
 
-type ErrorResponse struct {
-	FailedField string
-	Tag         string
-	Value       string
-}
+import "github.com/zuno90/go-ws/utils"
 
 type Response struct {
-	Success bool             `json:"success"`
-	Message string           `json:"message,omitempty" default:""`
-	Data    any              `json:"data,omitempty"`
-	Error   []*ErrorResponse `json:"errors,omitempty" default:""`
+	Success bool                   `json:"success"`
+	Message string                 `json:"message,omitempty" default:""`
+	Data    any                    `json:"data,omitempty"`
+	Error   []*utils.ErrorResponse `json:"errors,omitempty" default:""`
 }
 
-func Resp(s bool, m string, d any, e []*ErrorResponse) *Response {
+func Resp(s bool, m string, d any, e []*utils.ErrorResponse) *Response {
 	return &Response{
 		Success: s,
 		Message: m,
