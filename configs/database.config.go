@@ -20,10 +20,10 @@ var DBInstance *gorm.DB
 
 func ConnectPostgresDB() error {
 	conf := &dbConfig{
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_USERNAME"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
+		host:     os.Getenv("DB_HOST"),
+		user:     os.Getenv("DB_USERNAME"),
+		password: os.Getenv("DB_PASSWORD"),
+		dbname:   os.Getenv("DB_NAME"),
 	}
 	dns := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Ho_Chi_Minh",

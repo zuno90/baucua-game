@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/zuno90/go-ws/configs"
 	pb "github.com/zuno90/go-ws/pb"
 	"github.com/zuno90/go-ws/routes"
 	"google.golang.org/grpc"
@@ -33,6 +34,8 @@ func main() {
 	}
 	// connect database
 	// configs.ConnectPostgresDB()
+	configs.ConnectKeydbServer() // connect keydb caching
+
 	// go initGrpcServer() // init grpc server
 	initFiberServer() // init websocket server
 }

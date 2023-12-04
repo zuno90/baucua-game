@@ -1,7 +1,6 @@
 package game
 
 import (
-	"log"
 	"time"
 )
 
@@ -34,7 +33,7 @@ func HandleGameInfo() (Stages, int, int) {
 	h := time.Now().Hour()
 	m := time.Now().Minute()
 	s := time.Now().Second()
-	log.Printf("%d giờ %d phút %d giây", h, m, s)
+	// log.Printf("%d giờ %d phút %d giây", h, m, s)
 	currentGameNo := ((h*3600 + m*60 + s) / 60) + 1
 	var stage Stages
 	var c int

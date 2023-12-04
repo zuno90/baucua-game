@@ -8,6 +8,7 @@ const (
 	// JOINROOM   Types = "JOINROOM"
 	// LEAVEROOM  Types = "LEAVEROOM"
 	CHAT     Types = "CHAT"
+	BET      Types = "BET"
 	WELCOME  Types = "WELCOME"
 	GAMEINFO Types = "GAMEINFO"
 	RESULT   Types = "RESULT"

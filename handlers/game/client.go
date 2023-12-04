@@ -1,12 +1,14 @@
 package game
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/gofiber/websocket/v2"
-	"golang.org/x/exp/slices"
+	"github.com/zuno90/go-ws/configs"
+	"github.com/zuno90/go-ws/utils"
 )
 
 type Client struct {
@@ -17,32 +19,55 @@ type Client struct {
 	Player map[string]*Player
 }
 
-type Joiner struct {
-	CId string
-	PId int32
-}
+// type Joiner struct {
+// 	CId string
+// 	PId int32
+// }
 
-var players []*Joiner
+// var players []*Joiner
 
 func (c *Client) ConnectToServer() error {
+
 	defer func() {
 		// remove id from players slice
-		if idx := slices.IndexFunc(players, func(j *Joiner) bool { return j.CId == c.ID }); idx > -1 {
-			players = slices.Delete(players, idx, idx+1)
-		}
+		// if idx := slices.IndexFunc(players, func(j *Joiner) bool { return j.CId == c.ID }); idx > -1 {
+		// 	players = slices.Delete(players, idx, idx+1)
+		// }
 		// disconnect & close connection
 		c.Server.Unregister <- c
 		c.Conn.Close()
+
+		// configs.CacheClient.Close()
 	}()
+
 	// validate player existing player id
-	for _, p := range players {
-		if c.Player[c.ID].Id == p.PId {
-			c.SendError(ResErrorMessage("ERROR", 403, "Player is existing!"))
-			return fmt.Errorf("Player is existing!")
-		}
+	val, err := utils.MarshalBinary(c.Player)
+	if err != nil {
+		log.Fatal("can not marshal", err)
 	}
-	j := &Joiner{CId: c.ID, PId: c.Player[c.ID].Id}
-	players = append(players, j)
+	fmt.Println(fmt.Sprintf("players:%d", c.Player[c.ID].Id))
+	if err := utils.Set(fmt.Sprintf("players:%d", c.Player[c.ID].Id), val); err != nil {
+		log.Fatal("can not set to keydb", err)
+	}
+
+	// for _, p := range players {
+	// 	if c.Player[c.ID].Id == p.PId {
+	// 		c.SendError(ResErrorMessage("ERROR", 403, "Player is existing!"))
+	// 		return fmt.Errorf("Player is existing!")
+	// 	}
+	// }
+
+	// j := &Joiner{CId: c.ID, PId: c.Player[c.ID].Id}
+	// players = append(players, j)
+	// v, err := cf.CacheClient.HSet(context.Background(), "players", ,j).Result()
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+
+	// if err := c.isExisted(); err != nil {
+	// 	c.Server.Unregister <- c
+	// 	c.Conn.Close()
+	// }
 	c.Server.Register <- c
 
 	// listen all events
@@ -58,16 +83,26 @@ func (c *Client) ConnectToServer() error {
 			m := ResErrorMessage(nm.Type, 400, "Payload is wrong format") /* Payload{From: c.ID, Msg: "Payload is wrong format!"} */
 			c.SendError(m)
 		}
-		log.Println("wkdfjwdef", nm)
+		// client action by type
 		switch nm.Type {
 		case Types(CHAT):
 			c.Server.Broadcast <- nm
+		case Types(BET):
+			c.Server.Action <- nm
 		default:
-			log.Println("xuong dayyyyy")
 			m := ResErrorMessage(nm.Type, 400, "Payload is wrong format") /* Payload{From: c.ID, Msg: "Payload is wrong format!"} */
 			c.SendError(m)
 		}
 	}
+}
+
+func (c *Client) isExisted() error {
+	client, err := configs.CacheClient.HExists(context.Background(), "players", c.ID).Result()
+	if err != nil {
+		return err
+	}
+	fmt.Println("client", client)
+	return nil
 }
 
 func (c *Client) Send(d ResData) error {

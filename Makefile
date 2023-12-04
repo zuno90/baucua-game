@@ -1,3 +1,5 @@
+test:
+	go test
 dev:
 	nodemon --exec go run main.go --signal SIGTERM
 client:
