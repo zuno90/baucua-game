@@ -8,14 +8,14 @@ type PlayerAction interface {
 }
 
 type Player struct {
-	Id     int32   `json:"id"`
+	// Id     int32   `json:"id"`
 	Name   string  `json:"name"`
 	Amount float64 `json:"amount"`
 }
 
-func NewPlayer(id int32, username string, amount float64) *Player {
+func NewPlayer(username string, amount float64) *Player {
 	return &Player{
-		Id:     id,
+		// Id:     id,
 		Name:   username,
 		Amount: amount,
 	}

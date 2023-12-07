@@ -15,15 +15,16 @@ import (
 
 func HandleConn(c *websocket.Conn, s *st.Server, user *pb.User) {
 	uniqueID := uuid.New()
-	np := st.NewPlayer(user.GetId(), user.GetUsername(), user.GetAmount())
+	np := st.NewPlayer(user.GetUsername(), user.GetAmount())
 
 	client := &st.Client{
 		ID:     uniqueID.String(),
 		Conn:   c,
 		Server: s,
 		Room:   make([]string, 1),
-		Player: make(map[string]*st.Player),
+		Player: make(map[int32]*st.Player),
 	}
-	client.Player[client.ID] = np
+	// client.Player[client.ID] = np
+	client.Player[user.GetId()] = np
 	client.ConnectToServer()
 }

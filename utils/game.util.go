@@ -1,8 +1,6 @@
 package utils
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 var dice = []string{"bau", "cua", "tom", "ca", "ga", "nai"}
 

@@ -1,13 +1,11 @@
 package game
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/gofiber/websocket/v2"
-	"github.com/zuno90/go-ws/configs"
 	"github.com/zuno90/go-ws/utils"
 )
 
@@ -16,60 +14,28 @@ type Client struct {
 	Conn   *websocket.Conn
 	Server *Server
 	Room   []string
-	Player map[string]*Player
+	Player map[int32]*Player
 }
-
-// type Joiner struct {
-// 	CId string
-// 	PId int32
-// }
 
 // var players []*Joiner
 
 func (c *Client) ConnectToServer() error {
-
 	defer func() {
-		// remove id from players slice
 		// if idx := slices.IndexFunc(players, func(j *Joiner) bool { return j.CId == c.ID }); idx > -1 {
 		// 	players = slices.Delete(players, idx, idx+1)
 		// }
 		// disconnect & close connection
+		c.removePlayer()
 		c.Server.Unregister <- c
 		c.Conn.Close()
-
-		// configs.CacheClient.Close()
+		fmt.Println("close connection websocket!")
 	}()
 
-	// validate player existing player id
-	val, err := utils.MarshalBinary(c.Player)
-	if err != nil {
-		log.Fatal("can not marshal", err)
+	// validate then add to keydb
+	if err := c.addPlayer(); err != nil {
+		return err
 	}
-	fmt.Println(fmt.Sprintf("players:%d", c.Player[c.ID].Id))
-	if err := utils.Set(fmt.Sprintf("players:%d", c.Player[c.ID].Id), val); err != nil {
-		log.Fatal("can not set to keydb", err)
-	}
-
-	// for _, p := range players {
-	// 	if c.Player[c.ID].Id == p.PId {
-	// 		c.SendError(ResErrorMessage("ERROR", 403, "Player is existing!"))
-	// 		return fmt.Errorf("Player is existing!")
-	// 	}
-	// }
-
-	// j := &Joiner{CId: c.ID, PId: c.Player[c.ID].Id}
-	// players = append(players, j)
-	// v, err := cf.CacheClient.HSet(context.Background(), "players", ,j).Result()
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-
-	// if err := c.isExisted(); err != nil {
-	// 	c.Server.Unregister <- c
-	// 	c.Conn.Close()
-	// }
 	c.Server.Register <- c
-
 	// listen all events
 	for {
 		_, msg, err := c.Conn.ReadMessage()
@@ -96,15 +62,6 @@ func (c *Client) ConnectToServer() error {
 	}
 }
 
-func (c *Client) isExisted() error {
-	client, err := configs.CacheClient.HExists(context.Background(), "players", c.ID).Result()
-	if err != nil {
-		return err
-	}
-	fmt.Println("client", client)
-	return nil
-}
-
 func (c *Client) Send(d ResData) error {
 	resD, err := json.Marshal(d)
 	if err != nil {
@@ -125,4 +82,38 @@ func (c *Client) SendError(e ResError) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Client) addPlayer() error {
+	for k, v := range c.Player {
+		// validate player existing player id
+		pkey := fmt.Sprintf("players:%d", k)
+		p, _ := utils.Get(pkey)
+		if p != nil {
+			c.SendError(ResErrorMessage("ERROR", 403, "Player is existing!"))
+			return fmt.Errorf("Player %d is logging in, please log out first or login by other accounts!", k)
+		}
+		// set connected user to cache keydb
+		val, err := utils.MarshalBinary(v)
+		if err != nil {
+			log.Fatal("can not marshal", err)
+			return err
+		}
+
+		if err := utils.Set(pkey, val); err != nil {
+			log.Fatal("can not set to keydb", err)
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Client) removePlayer() {
+	fmt.Println("remove player")
+	for k := range c.Player {
+		pkey := fmt.Sprintf("players:%d", k)
+		if err := utils.Del(pkey); err != nil {
+			fmt.Sprintln("can not remove player ", k)
+		}
+	}
 }

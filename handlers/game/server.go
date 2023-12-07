@@ -74,28 +74,27 @@ func (server *Server) ListenEvents() {
 
 			// client info (private)
 			info := ResMessage(Types(LOGIN), string(clientInfo))
-			fmt.Println("vao day", info)
 			nc.Send(info)
 
 			// inform for others users (public)
 			server.Clients[nc.ID] = nc
 			log.Println("Size of Connection Server (connect): ", len(server.Clients))
-			for _, client := range server.Clients {
-				if nc.ID != client.ID {
-					mess := ResMessage(Types(WELCOME), fmt.Sprintf("%s Connected!...", nc.Player[nc.ID].Name))
+			for _, v := range nc.Player {
+				for _, client := range server.Clients {
+					mess := ResMessage(Types(WELCOME), fmt.Sprintf("%s has connected!...", v.Name))
 					client.Send(mess)
 				}
 			}
 
 		case ec := <-server.Unregister:
 			delete(server.Clients, ec.ID)
-			log.Println("Size of Connection Server (disconnect): ", len(server.Clients))
 			for _, client := range server.Clients {
-				if ec.ID != client.ID {
-					mess := ResMessage(Types(BYEBYE), fmt.Sprintf("%s Disconnected!...", ec.Player[ec.ID].Name))
+				for _, v := range ec.Player {
+					mess := ResMessage(Types(BYEBYE), fmt.Sprintf("%s has disconnected!...", v.Name))
 					client.Send(mess)
 				}
 			}
+			log.Println("Size of Connection Server (disconnect): ", len(server.Clients))
 
 		case message := <-server.Broadcast:
 			switch message.Type {

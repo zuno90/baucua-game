@@ -50,6 +50,5 @@ func SetUpWebsocket(app *fiber.App) {
 	// log.Println(c.Cookies("session")) // ""
 
 	// websocket.Conn bindings https://pkg.go.dev/github.com/fasthttp/websocket?tab=doc#pkg-index
-	// hdl.HandleConn(c, server)
 	// }))
 }

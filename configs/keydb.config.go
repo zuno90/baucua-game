@@ -29,12 +29,12 @@ func ConnectKeydbServer() error {
 	}
 	fmt.Println(pong)
 	// example
-	session := map[string]string{"name": "John", "surname": "Smith", "company": "Redis", "age": "29"}
-	for k, v := range session {
-		if err := CacheClient.HSet(context.Background(), "user-session:123", k, v).Err(); err != nil {
-			panic(err)
-		}
-	}
+	// session := map[string]string{"name": "John", "surname": "Smith", "company": "Redis", "age": "29"}
+	// for k, v := range session {
+	// 	if err := CacheClient.HSet(context.Background(), "user-session:123", k, v).Err(); err != nil {
+	// 		panic(err)
+	// 	}
+	// }
 
 	// userSession := CacheClient.HGetAll(context.Background(), "user-session:123").Val()
 	// fmt.Println(userSession["name"])
