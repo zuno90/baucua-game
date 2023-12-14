@@ -9,11 +9,6 @@ import (
 	"github.com/zuno90/go-ws/utils"
 )
 
-type ClientAction interface {
-	addPlayer()
-	removePlayer()
-}
-
 type Client struct {
 	ID     string
 	Conn   *websocket.Conn
@@ -46,7 +41,7 @@ func (c *Client) ConnectToServer() error {
 	for {
 		_, msg, err := c.Conn.ReadMessage()
 		if err != nil {
-			log.Println("Bad connection :::::", err)
+			fmt.Println("Bad connection :::::", err)
 			return err
 		}
 		nm := ResData{From: c.ID}
@@ -100,9 +95,11 @@ func (c *Client) addPlayer() error {
 		val, err := utils.MarshalBinary(v)
 		if err != nil {
 			log.Fatal("can not marshal", err)
+			return err
 		}
 		if err := utils.Set(pkey, val); err != nil {
 			log.Fatal("can not set to keydb", err)
+			return err
 		}
 	}
 	return nil

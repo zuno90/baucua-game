@@ -87,7 +87,8 @@ func waitForShutdownSignal() {
 	fmt.Println("Received shutdown signal. Shutting down gracefully...")
 	// Graceful shutdown code goes here
 	if err := utils.Clear(); err != nil {
-		log.Fatal("Clear all keydb cache", err)
+		log.Fatal("Can not clear all keydb cache", err)
 	}
+	fmt.Println("Clear all keydb cache of logged users!")
 	fmt.Println("Server shut down gracefully.")
 }
