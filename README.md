@@ -1,3 +1,3 @@
-1. We got user id 13, if have a user who connected by user id 13
-   -> Remove id 13 from slice players ([1,3,17,21,13])
-   -> Close connection
+1. Client connect to websocket, pass jwt on query params
+2. jwt is going to be sent auth service via GRPC
+3. Client is verified and connect to websocket server then cache in redis/keydb

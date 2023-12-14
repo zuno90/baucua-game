@@ -65,15 +65,18 @@ func (server *Server) ListenEvents() {
 	for {
 		select {
 		case nc := <-server.Register:
+			infoData := map[string]interface{}{"sid": nc.ID, "user": nc.Player}
 			// send info to Client
-			clientInfo, err := json.Marshal(nc.Player)
+			clientInfo, err := json.Marshal(infoData)
 			if err != nil {
 				log.Println("Can not marshal :::::", err)
 				server.Unregister <- nc
 			}
-
+			fmt.Println(string(clientInfo), "info client")
 			// client info (private)
 			info := ResMessage(Types(LOGIN), string(clientInfo))
+			fmt.Println(info, "info user")
+			// im := ResData{From: nc.ID, Msg: info}
 			nc.Send(info)
 
 			// inform for others users (public)
@@ -104,16 +107,16 @@ func (server *Server) ListenEvents() {
 				// log.Println(mv.FieldByName(message.Msg).IsValid())
 				if message.To == "all" || !mv.FieldByName(message.To).IsValid() {
 					for _, client := range server.Clients {
-						if client.ID != message.From {
-							log.Println("message broadcast", message)
-							client.Send(message)
-						}
+						// if client.ID != message.From {
+						log.Println("message broadcast all users", message)
+						client.Send(message)
+						// }
 					}
 				}
 				// Pm to user
 				if rc, ok := server.Clients[message.To]; ok {
 					if rc.ID == message.To {
-						log.Println("message broadcast", message)
+						log.Println("message broadcast to 1 user", message)
 						rc.Send(message)
 					}
 				}
@@ -130,32 +133,8 @@ func (server *Server) ListenEvents() {
 				}
 			}
 		case ma := <-server.Action:
-			fmt.Printf("%+v\n", ma)
+			// handle logic bet
+			fmt.Printf("action payload %+v\n", ma)
 		}
 	}
-
-	// 	client := server.Clients[ma.From]
-	// 	switch ma.Type {
-	// 	case "CREATEROOM":
-	// 		fmt.Println("client in room", client.Room)
-	// 		fmt.Println("length of client in room", len(client.Room))
-	// 		if len(client.Room) > 0 {
-	// 			em := ResMessage(ma.From, "You was currently in Room!")
-	// 			client.Send(em)
-	// 		}
-	// 		if err := client.CreateRoom(); err != nil {
-	// 			ms := ResMessage(ma.From, "Bad request! Can not create a new room!")
-	// 			client.Send(ms)
-	// 		}
-	// 	case "JOINROOM":
-	// 		roomId := ma.Msg
-	// 		r, ok := server.Rooms[roomId]
-	// 		if !ok {
-	// 			ms := ResMessage(ma.From, "Room is not existing!")
-	// 			client.Send(ms)
-	// 		}
-	// 		if err := client.JoinRoom(r); err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// }
 }

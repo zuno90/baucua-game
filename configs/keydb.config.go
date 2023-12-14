@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/spf13/viper"
 )
 
 type Keydb struct {
@@ -16,7 +16,8 @@ type Keydb struct {
 var CacheClient *redis.Client
 
 func ConnectKeydbServer() error {
-	conf := &Keydb{host: os.Getenv("KEYDB_HOST"), port: os.Getenv("KEYDB_PORT")}
+	host, port := viper.GetString("KEYDB_HOST"), viper.GetString("KEYDB_PORT")
+	conf := &Keydb{host: host, port: port}
 	addr := fmt.Sprintf("%s:%s", conf.host, conf.port)
 	CacheClient = redis.NewClient(&redis.Options{
 		Addr:     addr,

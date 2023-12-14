@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 	"github.com/zuno90/go-ws/configs"
 	pb "github.com/zuno90/go-ws/pb"
 	"github.com/zuno90/go-ws/routes"
@@ -28,16 +29,7 @@ type server struct {
 
 func main() {
 	log.SetFlags(log.Lshortfile)
-
-	env := os.Getenv("GO_ENV")
-	if env != "production" {
-		if err := godotenv.Load(); err != nil {
-			log.Fatalf("Some error occured. Err: %s", err)
-		}
-	}
-	// configs.ConnectPostgresDB() // connect database
-	configs.ConnectKeydbServer() // connect keydb caching
-
+	loadConfigs() // load config
 	// go initGrpcServer() // init grpc server
 	go initFiberServer() // init websocket server
 
@@ -45,21 +37,33 @@ func main() {
 	waitForShutdownSignal()
 }
 
+func loadConfigs() {
+	env := os.Getenv("GO_ENV")
+	if env != "production" {
+		if err := godotenv.Load(); err != nil {
+			log.Fatalf("Some error occured. Err: %s", err)
+		}
+	}
+	// Set up Viper to read environment variables
+	viper.AutomaticEnv()
+	// configs.ConnectPostgresDB() // connect database
+	configs.ConnectKeydbServer() // connect keydb caching
+}
+
 func initFiberServer() {
 	app := fiber.New()
-
 	// routes.SetUpHttpRoutes(app)
 	routes.SetUpWebsocket(app)
 
-	httpPort := os.Getenv("PORT")
-	log.Fatal(app.Listen("localhost:" + httpPort))
+	httpPort := viper.GetString("PORT")
+	log.Fatal(app.Listen(fmt.Sprintf("localhost:%s", httpPort)))
 	// Access the websocket server: ws://localhost:3000/ws/123?v=1.0
 	// https://www.websocket.org/echo.html
 }
 
 func initGrpcServer() {
-	grpcPort := os.Getenv("GRPC_PORT")
-	listen, err := net.Listen("tcp", ":"+grpcPort)
+	grpcPort := viper.GetString("GRPC_PORT")
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -83,7 +87,7 @@ func waitForShutdownSignal() {
 	fmt.Println("Received shutdown signal. Shutting down gracefully...")
 	// Graceful shutdown code goes here
 	if err := utils.Clear(); err != nil {
-		log.Fatalf("Clear all keydb cache", err)
+		log.Fatal("Clear all keydb cache", err)
 	}
 	fmt.Println("Server shut down gracefully.")
 }

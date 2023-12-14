@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func main() {
+func RunGRPCClientTest() {
 	conn, err := grpc.Dial(":3030", grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("could not connect %s", err)
