@@ -17,8 +17,7 @@ type Client struct {
 	Player map[int32]*Player
 }
 
-// var players []*Joiner
-var FormatError = ResErrorMessage(Types(ERROR), 400, "Payload is wrong format") /* Payload{From: c.ID, Msg: "Payload is wrong format!"} */
+var FormatError = ResErrorMessage(Types(ERROR), 400, "Payload is wrong format") // Payload{From: c.ID, Msg: "Payload is wrong format!"}
 
 func (c *Client) ConnectToServer() error {
 	defer func() {
@@ -44,19 +43,21 @@ func (c *Client) ConnectToServer() error {
 			fmt.Println("Bad connection :::::", err)
 			return err
 		}
-		nm := ResData{From: c.ID}
-		if e := json.Unmarshal([]byte(msg), &nm); e != nil || len(nm.Msg) == 0 {
-			log.Println("Payload is wrong format", e)
-			c.SendError(FormatError)
-		} else {
-			// client action by type
-			switch nm.Type {
-			case Types(CHAT):
-				c.Server.Broadcast <- nm
-			case Types(BET):
-				c.Server.Action <- nm
-			default:
-				return fmt.Errorf("no action matched or wrong format")
+		for _, v := range c.Player {
+			nm := ResData{From: c.ID, Name: v.Name}
+			if e := json.Unmarshal([]byte(msg), &nm); e != nil || len(nm.Msg) == 0 {
+				log.Println("Payload is wrong format", e)
+				c.SendError(FormatError)
+			} else {
+				// client action by type
+				switch nm.Type {
+				case Types(CHAT):
+					c.Server.Broadcast <- nm
+				case Types(BET):
+					c.Server.Action <- nm
+				default:
+					return fmt.Errorf("no action matched or wrong format")
+				}
 			}
 		}
 	}

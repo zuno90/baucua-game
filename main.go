@@ -30,7 +30,8 @@ type server struct {
 func main() {
 	log.SetFlags(log.Lshortfile)
 	loadConfigs() // load config
-	// go initGrpcServer() // init grpc server
+
+	go initGrpcServer() // init grpc server
 	go initFiberServer() // init websocket server
 
 	// Wait for interrupt signal to gracefully shutdown
@@ -56,7 +57,9 @@ func initFiberServer() {
 	routes.SetUpWebsocket(app)
 
 	httpPort := viper.GetString("PORT")
+	log.Printf("Fiber server is listening on port %s", httpPort)
 	log.Fatal(app.Listen(fmt.Sprintf("localhost:%s", httpPort)))
+
 	// Access the websocket server: ws://localhost:3000/ws/123?v=1.0
 	// https://www.websocket.org/echo.html
 }
@@ -67,8 +70,7 @@ func initGrpcServer() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-
-	log.Printf("GRPC is listening on port %s", listen.Addr().String())
+	log.Printf("GRPC server is listening on port %s", listen.Addr().String())
 	grpcServer := grpc.NewServer()
 
 	pb.RegisterAuthServer(grpcServer, &server{})

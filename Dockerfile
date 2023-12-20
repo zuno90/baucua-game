@@ -1,10 +1,10 @@
 FROM golang:1.20 AS build
 
-WORKDIR /usr/src/game-server
+WORKDIR /usr/src/app
 
-COPY go.mod go.sum .
+COPY ./go.mod ./go.sum ./
 RUN go mod download
-COPY . .
+COPY ./ .
 RUN go build -o bin .
 
 # --------- #
@@ -12,10 +12,7 @@ RUN go build -o bin .
 
 FROM golang:1.20 as state
 
-WORKDIR /usr/src/game-server
+WORKDIR /usr/src/app
+COPY --from=build /usr/src/app/bin .
 
-COPY --from=build /usr/src/game-server/bin .
-
-# CMD [ "/usr/src/game-server/bin" ]
-
-CMD /usr/src/game-server/bin
+# CMD /usr/src/app/bin

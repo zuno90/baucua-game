@@ -72,7 +72,6 @@ func (server *Server) ListenEvents() {
 				log.Println("Can not marshal :::::", err)
 				server.Unregister <- nc
 			}
-			fmt.Println(string(clientInfo), "info client")
 			// client info (private)
 			info := ResMessage(Types(LOGIN), string(clientInfo))
 			fmt.Println(info, "info user")
@@ -102,17 +101,14 @@ func (server *Server) ListenEvents() {
 		case message := <-server.Broadcast:
 			switch message.Type {
 			case Types(CHAT):
-				fmt.Println(message)
 				mv := reflect.ValueOf(message)
-				// log.Println(mv.FieldByName(message.Msg).IsValid())
 				if message.To == "all" || !mv.FieldByName(message.To).IsValid() {
 					for _, client := range server.Clients {
-						// if client.ID != message.From {
 						log.Println("message broadcast all users", message)
 						client.Send(message)
-						// }
 					}
 				}
+
 				// Pm to user
 				if rc, ok := server.Clients[message.To]; ok {
 					if rc.ID == message.To {

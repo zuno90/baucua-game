@@ -27,6 +27,7 @@ type ReqData struct {
 
 type ResData struct {
 	Type Types  `json:"type"`
+	Name string `json:"name,omitempty"`
 	From string `json:"from,omitempty"`
 	To   string `json:"to,omitempty"`
 	Msg  string `json:"msg"`
