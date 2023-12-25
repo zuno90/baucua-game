@@ -36,8 +36,8 @@ func SetUpWebsocket(app *fiber.App) {
 		}
 		return fiber.ErrUpgradeRequired
 	}
-	app.Use("/ws", h)
 
+	app.Use("/ws", h)
 	app.Get("/ws", websocket.New(func(c *websocket.Conn) {
 		// log.Println("jwt", c.Query("jwt")) // 1.0
 		hdl.HandleConn(c, server, user)

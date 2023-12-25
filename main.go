@@ -31,7 +31,7 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 	loadConfigs() // load config
 
-	go initGrpcServer() // init grpc server
+	go initGrpcServer()  // init grpc server
 	go initFiberServer() // init websocket server
 
 	// Wait for interrupt signal to gracefully shutdown
@@ -57,7 +57,10 @@ func initFiberServer() {
 	routes.SetUpWebsocket(app)
 
 	httpPort := viper.GetString("PORT")
-	log.Printf("Fiber server is listening on port %s", httpPort)
+	log.Printf("Fiber server is listening on port haha %s", httpPort)
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
 	log.Fatal(app.Listen(fmt.Sprintf("localhost:%s", httpPort)))
 
 	// Access the websocket server: ws://localhost:3000/ws/123?v=1.0

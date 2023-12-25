@@ -5,10 +5,7 @@ const d = {
 
 const j = JSON.stringify({
   type: "BET",
-  msg: {
-    dice: "bau",
-    amount: 1000,
-  },
+  msg: { dice: "bau", amount: 1000 },
 });
 
 const u = JSON.parse(
